@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { Group } from 'src/group/entities/group.entity';
 import {
     Column,
@@ -18,13 +19,20 @@ export class Permission {
     name: string;
 
     @ManyToMany(() => Group, (group) => group.permissions)
+    @Exclude()
     groups: Group[];
 
     @CreateDateColumn({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP(6)',
     })
+    @Transform(({ value }) => value.toISOString())
     createdAt: Date;
+
+    @Expose()
+    get displayName() {
+        return `Permission: ${this.name}`;
+    }
 
     constructor(partial: Partial<Permission>) {
         Object.assign(this, partial);

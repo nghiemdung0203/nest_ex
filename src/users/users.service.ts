@@ -50,7 +50,6 @@ export class UsersService {
         const { password, ...result } = user;
         await this.cacheManager.set(result.username, result);
         const cachedUser = await this.cacheManager.get(result.username);
-        console.log(`Cached user with permissions: ${JSON.stringify(cachedUser, null, 2)}`);
         return cachedUser;
       } else {
         throw new BadRequestException('Invalid username or password');
@@ -102,10 +101,7 @@ export class UsersService {
 
     try {
       const updatedUser = await this.usersRepository.save(user);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = updatedUser;
-      await this.cacheManager.set(username, result);
-      return result;
+      return updatedUser;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Exclude, Expose } from 'class-transformer';
 import { Group } from 'src/group/entities/group.entity';
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -8,12 +9,15 @@ export class User {
     id: number;
 
     @Column({ unique: true })
+    @Expose()
     username: string;
 
     @Column()
+    @Exclude()
     password: string;
 
     @Column({ nullable: true })
+    @Expose()
     avatarUrl: string;
 
     @ManyToMany(() => Group, (group) => group.users)
