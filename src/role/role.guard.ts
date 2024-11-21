@@ -42,7 +42,7 @@ export class RoleGuard implements CanActivate {
     }
 
     const cachedUser = await this.cacheManager.get<any>(username);
-
+    console.log(cachedUser)
     if (!cachedUser) {
       throw new UnauthorizedException('User session not found. Please log in again.');
     }

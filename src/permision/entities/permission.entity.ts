@@ -29,6 +29,9 @@ export class Permission {
     @Transform(({ value }) => value.toISOString())
     createdAt: Date;
 
+    @Column({ default: true})
+    isActive: boolean;
+
     @Expose()
     get displayName() {
         return `Permission: ${this.name}`;

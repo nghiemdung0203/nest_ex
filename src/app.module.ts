@@ -8,6 +8,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { PermisionModule } from './permision/permision.module';
 import * as redisStore from 'cache-manager-redis-store';
 import { GroupModule } from './group/group.module';
+import { ExportModule } from './export/export.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,7 +22,8 @@ import { GroupModule } from './group/group.module';
       isGlobal: true,
     }),
     PermisionModule,
-    GroupModule
+    GroupModule,
+    ExportModule
   ],
   controllers: [],
   providers: [],

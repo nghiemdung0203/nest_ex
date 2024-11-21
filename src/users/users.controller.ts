@@ -6,10 +6,12 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
   Request,
+  Res,
   SerializeOptions,
   UnauthorizedException,
   UploadedFile,
@@ -25,18 +27,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RequirePermissions } from 'src/role/requires-permissions.decorator';
 import { RoleGuard } from 'src/role/role.guard';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';
+import { UserExportService } from 'src/export/export.service';
+import { Response } from 'express';
 
-@Controller('users')
+@Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
+    private readonly exportService: UserExportService
   ) { }
 
   @Post()
   @SerializeOptions({ strategy: 'excludeAll' })
-  @RequirePermissions('CREATE_ACCOUNT')
   async createUser(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -50,7 +54,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RequirePermissions('UPDATE_ACCOUNT')
-  @Patch('profile')
+  @Patch('update_profile')
   @UseInterceptors(
     FileInterceptor('avatar', {
       limits: {
@@ -90,5 +94,25 @@ export class UsersController {
   @RequirePermissions('DELETE_ACCOUNT')
   async deleteAccount(@Param('id', new ValidationPipe({ transform: true, whitelist: true })) deleteId: number) {
     return await this.usersService.deleteAccountService(deleteId);
+  }
+
+  @Get('/allUsers')
+  async getAllUser(@Res() res: Response): Promise<any> {
+    try {
+      const users = await this.usersService.getAllUser();
+      const excelBuffer = await this.exportService.exportUserData(users);
+
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=users.xlsx'
+      );
+      res.send(excelBuffer);
+    } catch (error) {
+      return error.message
+    }
   }
 }

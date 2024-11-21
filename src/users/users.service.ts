@@ -17,6 +17,8 @@ import { LoginDto } from './dto/login.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { plainToInstance } from 'class-transformer';
+import { UserDto } from './dto/user-export.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,7 +28,7 @@ export class UsersService {
     private readonly entityManager: EntityManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -129,6 +131,33 @@ export class UsersService {
         throw error;
       }
       throw new Error(`Failed to delete user: ${error.message}`);
+    }
+  }
+
+
+  async getAllUser(): Promise<UserDto[]> {
+    try {
+      const allUser = await this.usersRepository.createQueryBuilder('user')
+        .leftJoinAndSelect('user.groups', 'groups')
+        .leftJoinAndSelect('groups.permissions', 'permissions')
+        .select([
+          'user.id',
+          'user.username',
+          'user.avatarUrl',
+          'groups.id',
+          'groups.name',
+          'permissions.id',
+          'permissions.name',
+        ]).getMany();
+
+      // Transform the users directly to ExportUserDTO
+      const transformedUsers = plainToInstance(UserDto, allUser, { excludeExtraneousValues: true });
+
+      console.log('Transformed Users:', JSON.stringify(transformedUsers, null, 2)); // Log the transformedUsers
+
+      return transformedUsers; // Return the transformed users
+    } catch (error) {
+      throw new Error(error.message);
     }
   }
 }
