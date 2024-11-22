@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ExportController } from './export.controller';
-import { UserExportService } from './export.service';
+import { UserExportService } from './export-user.service';
 
 @Module({
   controllers: [ExportController],

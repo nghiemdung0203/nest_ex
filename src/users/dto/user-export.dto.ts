@@ -1,15 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Expose, Transform } from 'class-transformer';
 
-class PermissionDto {
-  @Expose()
-  id: number;
-
-  @Expose()
-  name: string;
-}
-
-
 
 export class UserDto {
   @Expose()
@@ -22,11 +13,11 @@ export class UserDto {
   avatarUrl: string;
 
   @Expose()
-  @Transform(({ obj }) =>
-    obj.groups.flatMap((group: any) => group.permissions).map((permission: any) => ({
-      id: permission.id,
-      name: permission.name,
-    })),
-  )
-  permissions: PermissionDto[];
+  @Transform(({ obj }) => {
+    const permissions = obj.groups.flatMap((group: any) => group.permissions)
+      .map((permission: any) => `id: ${permission.id}, name: ${permission.name}`);
+
+    return permissions.join('\n');
+  })
+  permissions: string;
 }

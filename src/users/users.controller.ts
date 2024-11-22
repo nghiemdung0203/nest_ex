@@ -27,7 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RequirePermissions } from 'src/role/requires-permissions.decorator';
 import { RoleGuard } from 'src/role/role.guard';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';
-import { UserExportService } from 'src/export/export.service';
+import { UserExportService } from 'src/export/export-user.service';
 import { Response } from 'express';
 
 @Controller('user')
